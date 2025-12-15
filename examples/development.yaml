@@ -1,0 +1,27 @@
+apiVersion: cache.example.com/v1
+kind: RedisCluster
+metadata:
+  name: dev-redis
+  namespace: default
+spec:
+  # Minimal development cluster
+  masters: 3
+  minMasters: 3
+  replicasPerMaster: 1
+
+  redisVersion: "7.2"
+
+  # Aggressive autoscaling for testing
+  autoScaleEnabled: true
+  cpuThreshold: 60              # Scale up quickly
+  cpuThresholdLow: 15           # Scale down quickly
+  memoryThreshold: 60
+  memoryThresholdLow: 20
+
+  # Short timeouts for faster testing
+  reshardTimeoutSeconds: 300    # 5 minutes
+  scaleCooldownSeconds: 30      # 30 seconds (fast iteration)
+
+  # Prometheus
+  prometheusURL: "http://prometheus-operated.monitoring.svc:9090"
+  metricsQueryInterval: 10      # Check frequently

@@ -1,0 +1,55 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+testbin/
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Kubernetes Generated files
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# Build artifacts
+manager
+*.tar.gz
+
+# Temporary files
+*.log
+*.tmp
+/tmp/
+
+# Kustomize
+config/manager/kustomization.yaml.bak
+
+# Redis data
+dump.rdb
+appendonly.aof
+
+# Secret files
+*.key
+*.pem
+*.crt
+/secrets/
+
+# Local testing
+redis-operator.log

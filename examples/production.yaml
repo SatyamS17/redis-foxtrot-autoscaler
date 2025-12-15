@@ -1,0 +1,27 @@
+apiVersion: cache.example.com/v1
+kind: RedisCluster
+metadata:
+  name: prod-redis
+  namespace: production
+spec:
+  # High-availability production cluster
+  masters: 10
+  minMasters: 5
+  replicasPerMaster: 2          # 2 replicas for HA
+
+  redisVersion: "7.2"
+
+  # Conservative autoscaling for production
+  autoScaleEnabled: true
+  cpuThreshold: 80              # Scale up at 80% CPU
+  cpuThresholdLow: 25           # Scale down below 25% CPU
+  memoryThreshold: 85           # Scale up at 85% memory
+  memoryThresholdLow: 35        # Scale down below 35% memory
+
+  # Longer cooldown for stability
+  reshardTimeoutSeconds: 900    # 15 minutes for large clusters
+  scaleCooldownSeconds: 300     # 5 minutes between scaling operations
+
+  # Prometheus
+  prometheusURL: "http://prometheus-operated.monitoring.svc:9090"
+  metricsQueryInterval: 30      # Check metrics every 30 seconds

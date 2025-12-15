@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: redis-redis-cluster
+  namespace: default
+  labels:
+    app.kubernetes.io/instance: redis
+    app.kubernetes.io/name: redis-cluster
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: redis
+      app.kubernetes.io/name: redis-cluster
+  podMetricsEndpoints:
+  - port: tcp-redis
+    interval: 15s
+  namespaceSelector:
+    matchNames:
+    - default
