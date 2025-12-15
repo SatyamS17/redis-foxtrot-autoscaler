@@ -81,8 +81,9 @@ A 3-master cluster with 1 replica each requires **8 pods total**
 ```bash
 git clone https://github.com/SatyamS17/redis-foxtrot-autoscaler.git
 ```
+Edit the cluster.yaml config file to configure autoscaler
 
-### Edit the cluster.yaml config file to configure autoscaler
+### Build and deploy autoscaler
 ```bash
 ./build.sh
 ```
