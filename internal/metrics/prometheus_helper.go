@@ -24,7 +24,7 @@ func QueryPrometheus(prometheusURL string, query string) (float64, error) {
 
 	result, warnings, err := v1api.Query(ctx, query, time.Now())
 	if err != nil {
-		return 0, fmt.Errorf("Prometheus query failed: %v", err)
+		return 0, fmt.Errorf("prometheus query failed: %v", err)
 	}
 
 	if len(warnings) > 0 {

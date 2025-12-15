@@ -66,14 +66,14 @@ func (r *RedisClusterReconciler) checkReshardingStatus(ctx context.Context, clus
 			"standbyPod", cluster.Status.StandbyPod)
 
 		if cluster.Status.OverloadedPod == "" {
-			logger.Error(fmt.Errorf("OverloadedPod is empty"), "Cannot create reshard job without overloaded pod")
+			logger.Error(fmt.Errorf("overloadedPod is empty"), "Cannot create reshard job without overloaded pod")
 			cluster.Status.IsResharding = false
 			_ = r.Status().Update(ctx, cluster)
 			return ctrl.Result{}, nil
 		}
 
 		if cluster.Status.StandbyPod == "" {
-			logger.Error(fmt.Errorf("StandbyPod is empty"), "Cannot create reshard job without standby pod")
+			logger.Error(fmt.Errorf("standbyPod is empty"), "Cannot create reshard job without standby pod")
 			cluster.Status.IsResharding = false
 			_ = r.Status().Update(ctx, cluster)
 			return ctrl.Result{}, nil

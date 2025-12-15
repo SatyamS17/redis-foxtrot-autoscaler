@@ -165,7 +165,7 @@ func (r *RedisClusterReconciler) queryCPUMetrics(ctx context.Context, v1api prom
 
 	cpuResult, warnings, err := v1api.Query(ctx, cpuQuery, time.Now())
 	if err != nil {
-		return nil, fmt.Errorf("Prometheus CPU query failed: %w", err)
+		return nil, fmt.Errorf("prometheus CPU query failed: %w", err)
 	}
 	if len(warnings) > 0 {
 		logger.Info("Prometheus CPU warnings", "warnings", warnings)
@@ -205,7 +205,7 @@ func (r *RedisClusterReconciler) queryMemoryMetrics(ctx context.Context, v1api p
 
 	memoryResult, warnings, err := v1api.Query(ctx, memoryQuery, time.Now())
 	if err != nil {
-		return nil, fmt.Errorf("Prometheus memory query failed: %w", err)
+		return nil, fmt.Errorf("prometheus memory query failed: %w", err)
 	}
 	if len(warnings) > 0 {
 		logger.Info("Prometheus memory warnings", "warnings", warnings)

@@ -34,7 +34,7 @@ git commit -m "Initial release: Redis Cluster Autoscaler
 "
 
 # Add GitHub remote (replace YOUR_USERNAME with your GitHub username)
-git remote add origin https://github.com/YOUR_USERNAME/redis-operator.git
+git remote add origin https://github.com/SatyamS17/redis-foxtrot-autoscaler.git
 
 # Push to GitHub
 git branch -M main
@@ -96,12 +96,12 @@ First stable release!
 
 Install the operator:
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/YOUR_USERNAME/redis-operator/v1.0.0/install.yaml
+kubectl apply -f https://raw.githubusercontent.com/SatyamS17/redis-operator/v1.0.0/install.yaml
 ```
 
 Create a Redis cluster:
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/YOUR_USERNAME/redis-operator/v1.0.0/examples/basic.yaml
+kubectl apply -f https://raw.githubusercontent.com/SatyamS17/redis-operator/v1.0.0/examples/basic.yaml
 ```
 
 Verify:

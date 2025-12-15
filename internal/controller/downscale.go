@@ -43,7 +43,7 @@ func (r *RedisClusterReconciler) checkDrainStatus(ctx context.Context, cluster *
 		}
 
 		if podName == cluster.Status.StandbyPod {
-			logger.Error(fmt.Errorf("Attempted to drain standby pod"), "Invalid operation",
+			logger.Error(fmt.Errorf("attempted to drain standby pod"), "Invalid operation",
 				"standbyPod", cluster.Status.StandbyPod)
 			cluster.Status.IsDraining = false
 			cluster.Status.PodToDrain = ""
