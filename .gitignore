@@ -53,3 +53,9 @@ appendonly.aof
 
 # Local testing
 redis-operator.log
+docs/CONFIGURATION.md
+docs/DEPLOYMENT.md
+docs/QUICKSTART.md
+docs/EXISTING_CLUSTER_SUPPORT.md
+*.log
+*.sh
