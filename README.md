@@ -34,7 +34,7 @@ kubectl get servicemonitors -A
 Install the Redis Cluster Autoscaler operator directly from GitHub:
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/SatyamS17/redis-foxtrot-autoscaler/main/release/operator.yaml
+kubectl apply -f https://raw.githubusercontent.com/SatyamS17/redis-foxtrot-autoscaler/main/operator.yaml
 ```
 
 This installs:
