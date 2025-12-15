@@ -59,3 +59,4 @@ docs/QUICKSTART.md
 docs/EXISTING_CLUSTER_SUPPORT.md
 *.log
 *.sh
+.devcontainer/
