@@ -1,109 +1,128 @@
 # Redis Cluster Autoscaler
 
-A Kubernetes operator that provides intelligent autoscaling for Redis clusters with zero-downtime operations.
+A Kubernetes operator that provides intelligent, zero-downtime autoscaling for Redis clusters.
 
-## Overview
+---
 
-The Redis Cluster Autoscaler automatically scales your Redis cluster up and down based on CPU and memory metrics. It uses a hot standby strategy to enable instant scale-up operations without waiting for pod startup times.
+## How Installation Works (Important)
 
-### Key Features
+The autoscaler is installed by applying **pre-built Kubernetes manifests** hosted in this GitHub repository.
+The operator image is already built and publicly available.
 
-- **Zero-Downtime Scaling**: Hot standby master node enables instant scale-up (~5-10 seconds)
-- **Intelligent Monitoring**: Automatically scales based on CPU and memory usage via Prometheus
-- **Automatic Resharding**: Manages Redis cluster slot distribution during scaling operations
-- **Pre-seeded Scale-Down**: Uses Redis replication to speed up slot migration
-- **Flexible Deployment**: Supports both operator-managed and existing Redis clusters
-- **Cooldown Protection**: Prevents rapid scaling oscillations
-
-# User Guide
-
-This guide walks you through installing, configuring, and using the Redis Cluster Autoscaler.
-
-## Table of Contents
-
-- Prerequisites
-- Installation
-- Quick Start
-- Basic Configuration
-- Common Use Cases
-- Monitoring Your Cluster
-- Next Steps
+---
 
 ## Prerequisites
 
-Before installing the Redis Cluster Autoscaler, ensure you have the following prerequisites ready.
+Before installing, ensure you have:
 
-### Required Infrastructure
+* Kubernetes v1.19+
+* `kubectl` configured for your cluster
+* A running Prometheus stack (Prometheus Operator recommended)
+* Cluster-admin permissions (required to install CRDs)
 
-1. **Kubernetes Cluster** (v1.19 or later)
-
-```bash
-kubectl version --short
-````
-
-2. **kubectl** configured to access your cluster
+Verify:
 
 ```bash
 kubectl cluster-info
-```
-
-3. **Prometheus Operator Installed and Ready**
-
-The Redis Cluster Autoscaler requires a functioning Prometheus stack to gather metrics.
-
-```bash
 kubectl get servicemonitors -A
 ```
 
-4. **Cluster Admin Access** (to install CRDs)
+---
 
-### Recommended Tools
+## Installation 
 
-* Helm (v3+)
-* Storage Class (for Redis PVCs)
-* Metrics Server (optional)
-
-### Resource Requirements
-
-| Component     | CPU (minimum) | Memory (minimum) |
-| ------------- | ------------- | ---------------- |
-| Per Redis Pod | 100m          | 256Mi            |
-| Operator Pod  | 100m          | 50Mi             |
-
-Minimum cluster size:
-A 3-master cluster with 1 replica each requires **8 pods total**
-(3 masters + 3 replicas + 1 standby master + 1 standby replica)
-
-## Installation
-
-### Install from GitHub
+Install the Redis Cluster Autoscaler operator directly from GitHub:
 
 ```bash
-git clone https://github.com/SatyamS17/redis-foxtrot-autoscaler.git
+kubectl apply -f https://raw.githubusercontent.com/SatyamS17/redis-foxtrot-autoscaler/main/release/operator.yaml
 ```
-Edit the cluster.yaml config file to configure autoscaler
 
-### Build and deploy autoscaler
-```bash
-./build.sh
-```
-### Verify Installation
+This installs:
+
+* The `RedisCluster` CustomResourceDefinition (CRD)
+* Required RBAC permissions
+* The autoscaler controller deployment
+
+> This step is required **once per Kubernetes cluster**.
+
+---
+
+## Verify Operator Installation
 
 ```bash
-kubectl get crd redisclusters.cache.example.com
 kubectl get pods -n redis-operator-system
 ```
 
 Expected output:
 
 ```text
-redis-operator-controller-manager   2/2   Running
+redis-operator-controller-manager   Running
 ```
 
-### Verify Cluster Health
+Verify the CRD exists:
 
 ```bash
-kubectl exec -it my-redis-0 -- redis-cli cluster info
+kubectl get crd redisclusters.cache.example.com
+```
+
+---
+
+## Deploying a Redis Cluster (Required)
+
+After the operator is installed, you must create a **RedisCluster** resource.
+This tells the autoscaler **what Redis cluster to manage**.
+
+---
+
+### Create `redis-cluster.yaml`
+
+```yaml
+apiVersion: cache.example.com/v1
+kind: RedisCluster
+metadata:
+  name: redis-cluster
+  namespace: default
+spec:
+  masters: 3
+  minMasters: 3
+  replicasPerMaster: 1
+  redisVersion: "7.2"
+
+  autoScaleEnabled: true
+
+  cpuThreshold: 70
+  cpuThresholdLow: 20
+  memoryThreshold: 70
+  memoryThresholdLow: 30
+
+  reshardTimeoutSeconds: 600
+  scaleCooldownSeconds: 60
+
+  prometheusURL: "http://prometheus-operated.monitoring.svc:9090"
+  metricsQueryInterval: 15
+```
+
+---
+
+### Apply the RedisCluster
+
+```bash
+kubectl apply -f redis-cluster.yaml
+```
+
+Once applied, the operator will:
+
+* Create and bootstrap the Redis cluster
+* Monitor CPU and memory usage via Prometheus
+* Automatically scale up or down when thresholds are crossed
+* Safely reshard Redis slots with zero downtime
+
+---
+
+## Verify Redis Cluster Health
+
+```bash
+kubectl exec -it redis-cluster-0 -- redis-cli cluster info
 ```
 
 Expected:
@@ -114,43 +133,21 @@ cluster_slots_assigned:16384
 cluster_known_nodes:8
 ```
 
-## Monitoring
+(3 masters, 3 replicas, 1 standby master, 1 standby replica)
+
+---
+
+## Monitoring and Debugging
+
+Watch autoscaler status:
 
 ```bash
-kubectl get rediscluster my-redis -w
-kubectl logs -n redis-operator-system deployment/redis-operator-controller-manager -f
+kubectl get rediscluster redis-cluster -w
 ```
 
-## Appendix
-
-### Useful Commands
+View operator logs:
 
 ```bash
-kubectl delete rediscluster my-redis
-
-kubectl patch rediscluster my-redis -p '{"metadata":{"finalizers":[]}}' --type=merge
-kubectl delete rediscluster my-redis --force --grace-period=0
-
-kubectl get redisclusters -A
-kubectl describe rediscluster my-redis
-
-kubectl exec -it redis-cluster-0 -- redis-cli CLUSTER SLOTS
-kubectl exec -it redis-cluster-0 -- redis-cli CLUSTER NODES
-```
-
-### Default Values
-
-| Field                 | Default |
-| --------------------- | ------- |
-| redisVersion          | "7.2"   |
-| minMasters            | 3       |
-| replicasPerMaster     | 1       |
-| cpuThresholdLow       | 20      |
-| memoryThreshold       | 70      |
-| memoryThresholdLow    | 30      |
-| reshardTimeoutSeconds | 600     |
-| scaleCooldownSeconds  | 60      |
-| metricsQueryInterval  | 15      |
-| manageStatefulSet     | true    |
-
+kubectl logs -n redis-operator-system \
+  deployment/redis-operator-controller-manager -f
 ```
