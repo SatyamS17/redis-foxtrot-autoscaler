@@ -76,26 +76,16 @@ A 3-master cluster with 1 replica each requires **8 pods total**
 
 ## Installation
 
-### Option 1: Install from GitHub (Development)
+### Install from GitHub
 
 ```bash
 git clone https://github.com/SatyamS17/redis-foxtrot-autoscaler.git
-cd redis-foxtrot-autoscaler
-
-make install
-make vendor
-make manifests
-make deploy
 ```
 
-### Option 2: Using Manifests (Production)
-
+### Edit the cluster.yaml config file to configure autoscaler
 ```bash
-kubectl apply -f config/crd/bases/cache.example.com_redisclusters.yaml
-kubectl create namespace redis-operator-system
-kubectl apply -f config/manager/manager.yaml
+./build.sh
 ```
-
 ### Verify Installation
 
 ```bash
@@ -107,36 +97,6 @@ Expected output:
 
 ```text
 redis-operator-controller-manager   2/2   Running
-```
-
-## Quick Start
-
-### Create Your First Redis Cluster
-
-```yaml
-apiVersion: cache.example.com/v1
-kind: RedisCluster
-metadata:
-  name: my-redis
-  namespace: default
-spec:
-  masters: 3
-  minMasters: 3
-  replicasPerMaster: 1
-
-  autoScaleEnabled: true
-  cpuThreshold: 70
-  cpuThresholdLow: 20
-  memoryThreshold: 70
-  memoryThresholdLow: 30
-
-  redisVersion: "7.2"
-```
-
-Apply:
-
-```bash
-kubectl apply -f my-cluster.yaml
 ```
 
 ### Verify Cluster Health
@@ -172,6 +132,9 @@ kubectl delete rediscluster my-redis --force --grace-period=0
 
 kubectl get redisclusters -A
 kubectl describe rediscluster my-redis
+
+kubectl exec -it redis-cluster-0 -- redis-cli CLUSTER SLOTS
+kubectl exec -it redis-cluster-0 -- redis-cli CLUSTER NODES
 ```
 
 ### Default Values
