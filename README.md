@@ -57,8 +57,6 @@ kubectl get svc -n monitoring | grep prometheus-operated
 
 You should see `prometheus-operated` service at `prometheus-operated.monitoring.svc:9090`
 
-**📖 For detailed Prometheus setup, see [docs/PROMETHEUS_SETUP.md](docs/PROMETHEUS_SETUP.md)**
-
 ---
 
 ## Installation 
