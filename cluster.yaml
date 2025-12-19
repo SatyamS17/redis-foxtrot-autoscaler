@@ -9,11 +9,11 @@ spec:
   replicasPerMaster: 1
   redisVersion: "7.2"
   autoScaleEnabled: true
-  cpuThreshold: 70
+  cpuThreshold: 60
   cpuThresholdLow: 20
   memoryThreshold: 70
   memoryThresholdLow: 30
-  reshardTimeoutSeconds: 600
-  scaleCooldownSeconds: 60
+  reshardTimeoutSeconds: 120
+  scaleCooldownSeconds: 120
   prometheusURL: "http://prometheus-operated.monitoring.svc:9090"
   metricsQueryInterval: 15

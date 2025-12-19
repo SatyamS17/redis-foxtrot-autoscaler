@@ -18,7 +18,7 @@ echo "Overloaded pod to relieve: $OVERLOADED_POD"
 
 # Step 0: Try to fix cluster inconsistencies first (best-effort)
 echo "=== Step 0: Running cluster fix to ensure consistency ==="
-redis-cli --cluster fix $ENTRYPOINT --cluster-fix-with-unreachable-masters || {
+timeout 300 redis-cli --cluster fix $ENTRYPOINT --cluster-fix-with-unreachable-masters || {
   echo "WARNING: Cluster fix encountered issues, but continuing..."
 }
 
@@ -109,7 +109,7 @@ for ip in $node_ips; do
 done
 sleep 2
 
-# Reshard using the standby node (use pipeline to speed up but not too large)
+# Reshard using the standby node (use smaller pipeline for smoother migration)
 echo "=== Resharding $SLOTS_TO_MOVE slots ==="
 redis-cli --cluster reshard $ENTRYPOINT \
   --cluster-from $OVERLOADED_MASTER_ID \
@@ -117,7 +117,7 @@ redis-cli --cluster reshard $ENTRYPOINT \
   --cluster-slots $SLOTS_TO_MOVE \
   --cluster-yes \
   --cluster-timeout 10000 \
-  --cluster-pipeline 100
+  --cluster-pipeline 10
 
 # Re-enable full coverage
 echo "=== Re-enabling full coverage ==="

@@ -23,7 +23,7 @@ if [ "$CLUSTER_STATE" = "ok" ]; then
   echo "Cluster state is OK, skipping cluster fix"
 else
   echo "Cluster state is '$CLUSTER_STATE', running fix..."
-  timeout 30 redis-cli --cluster fix $ENTRYPOINT --cluster-fix-with-unreachable-masters || {
+  timeout 300 redis-cli --cluster fix $ENTRYPOINT --cluster-fix-with-unreachable-masters || {
     echo "WARNING: Cluster fix failed or timed out, continuing anyway..."
   }
 fi
@@ -205,7 +205,7 @@ else
       --cluster-to $DEST1_ID \
       --cluster-yes \
       --cluster-timeout 10000 \
-      --cluster-pipeline 100
+      --cluster-pipeline 10
 
     sleep 5
 
@@ -215,7 +215,7 @@ else
       --cluster-to $DEST2_ID \
       --cluster-yes \
       --cluster-timeout 10000 \
-      --cluster-pipeline 100
+      --cluster-pipeline 10
   else
     # All slots go to single destination
     echo "Migrating all $SLOT_COUNT slots to $DEST1_ID..."
@@ -224,7 +224,7 @@ else
       --cluster-to $DEST1_ID \
       --cluster-yes \
       --cluster-timeout 10000 \
-      --cluster-pipeline 100
+      --cluster-pipeline 10
   fi
 
   sleep 5
